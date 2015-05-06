@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mag3llan.Api.Client", "Mag3llan.Api.Client\Mag3llan.Api.Client.csproj", "{5F5E89BF-8C54-4AD1-A921-420850E43FB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mag3llan.Api.Tests", "Mag3llan.Api.Tests\Mag3llan.Api.Tests.csproj", "{7745CA94-4F20-43F2-A9C5-21E69C016EC1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F5E89BF-8C54-4AD1-A921-420850E43FB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F5E89BF-8C54-4AD1-A921-420850E43FB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F5E89BF-8C54-4AD1-A921-420850E43FB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F5E89BF-8C54-4AD1-A921-420850E43FB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7745CA94-4F20-43F2-A9C5-21E69C016EC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7745CA94-4F20-43F2-A9C5-21E69C016EC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7745CA94-4F20-43F2-A9C5-21E69C016EC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7745CA94-4F20-43F2-A9C5-21E69C016EC1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
