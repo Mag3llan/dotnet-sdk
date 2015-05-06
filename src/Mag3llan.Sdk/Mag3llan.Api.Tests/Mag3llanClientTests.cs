@@ -64,5 +64,11 @@ namespace Mag3llan.Api.Tests
                 Assert.That(ex.ParamName, Is.EqualTo("key"));
             }
         }
+
+        [TestFixture]
+        public class SetPreferenceTests
+        {
+ 
+        }
     }
 }
