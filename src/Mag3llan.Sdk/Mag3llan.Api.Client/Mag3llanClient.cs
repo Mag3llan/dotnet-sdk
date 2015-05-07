@@ -9,12 +9,20 @@ namespace Mag3llan.Api.Client
 {
     public class Mag3llanClient
     {
-        private RestClient client = new RestClient();
+        private IRestClient client;
+
         public Mag3llanClient(string hostname, string key)
+            : this(new RestClient(), hostname, key)
         {
+        }
+
+        internal Mag3llanClient(IRestClient client, string hostname, string key)
+        {
+            if (client == null) throw new ArgumentNullException("client");
             if (string.IsNullOrWhiteSpace(hostname)) throw new ArgumentNullException("hostname");
             if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException("key");
 
+            this.client = client;
             this.client.BaseUrl = new Uri(string.Format("http://{0}/api/", hostname));
             this.client.AddDefaultHeader("content-type", "application/json");
             this.client.AddDefaultHeader("Access_Token", key);

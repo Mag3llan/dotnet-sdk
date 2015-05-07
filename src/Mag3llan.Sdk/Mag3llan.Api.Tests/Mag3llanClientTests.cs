@@ -2,6 +2,8 @@
 using NUnit;
 using NUnit.Framework;
 using Mag3llan.Api.Client;
+using RestSharp;
+using FakeItEasy;
 
 namespace Mag3llan.Api.Tests
 {
@@ -75,7 +77,16 @@ namespace Mag3llan.Api.Tests
         [TestFixture]
         public class SetPreferenceTests
         {
-            private Mag3llanClient sdk = new Mag3llanClient("http://api", "abc");
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [TestFixtureSetUp]
+            public void SetupOnce()
+            {
+                this.client = A.Fake<IRestClient>();
+                //A.CallTo(() => )
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
 
             [Test]
             public void NegativeUserId()
@@ -93,6 +104,13 @@ namespace Mag3llan.Api.Tests
 
                 Assert.That(ex.ParamName, Is.EqualTo("itemId"));
                 Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestCreatesPreference()
+            {
+                sdk.SetPreference(1, 1, 1);
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).MustHaveHappened(Repeated.Exactly.Once);
             }
         }
     }
