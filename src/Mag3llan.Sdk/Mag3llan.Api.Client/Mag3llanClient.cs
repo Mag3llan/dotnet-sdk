@@ -22,6 +22,8 @@ namespace Mag3llan.Api.Client
 
         public void SetPreference(long userId, long itemId, double value)
         {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+
             var preference = new Preference(userId, itemId, value);
 
 

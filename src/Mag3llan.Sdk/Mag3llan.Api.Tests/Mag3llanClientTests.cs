@@ -68,7 +68,16 @@ namespace Mag3llan.Api.Tests
         [TestFixture]
         public class SetPreferenceTests
         {
- 
+            private Mag3llanClient sdk = new Mag3llanClient("http://api", "abc");
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.SetPreference(-1, 1, 1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
         }
     }
 }
