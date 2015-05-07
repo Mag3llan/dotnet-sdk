@@ -10,40 +10,47 @@ namespace Mag3llan.Api.Tests
         [TestFixture]
         public class ConstructorTests
         {
-            [Test]
-            public void InvalidUriThrowsException()
+            [TestCase("@")]
+            [TestCase("#")]
+            [TestCase(".")]
+            [TestCase("'")]
+            [TestCase("(")]
+            [TestCase(")")]
+            [TestCase("%")]
+            [TestCase("~")]
+            public void InvalidUriCharactersThrowsException(string chars)
             {
-                Assert.Throws<UriFormatException>(() => new Mag3llanClient("foo", "bar"));
+                Assert.Throws<UriFormatException>(() => new Mag3llanClient(chars, "bar"));
             }
 
             [Test]
-            public void MissingUriThrowsException()
+            public void MissingHostnameThrowsException()
             {
                 var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient(null, "bar"));
 
-                Assert.That(ex.ParamName, Is.EqualTo("uri"));
+                Assert.That(ex.ParamName, Is.EqualTo("hostname"));
             }
 
             [Test]
-            public void EmptyUriThrowsException()
+            public void EmptyHostnameThrowsException()
             {
                 var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient(string.Empty, "bar"));
 
-                Assert.That(ex.ParamName, Is.EqualTo("uri"));
+                Assert.That(ex.ParamName, Is.EqualTo("hostname"));
             }
 
             [Test]
-            public void BlankUriThrowsException()
+            public void BlankHostnameThrowsException()
             {
                 var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("  ", "bar"));
 
-                Assert.That(ex.ParamName, Is.EqualTo("uri"));
+                Assert.That(ex.ParamName, Is.EqualTo("hostname"));
             }
 
             [Test]
             public void MissingKeyThrowsException()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("http://api", null));
+                var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("api", null));
 
                 Assert.That(ex.ParamName, Is.EqualTo("key"));
             }
@@ -76,6 +83,15 @@ namespace Mag3llan.Api.Tests
                 var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.SetPreference(-1, 1, 1));
 
                 Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void NegativeItemId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.SetPreference(1, -1, 1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("itemId"));
                 Assert.That(ex.Message, Is.StringStarting("must be positive"));
             }
         }
