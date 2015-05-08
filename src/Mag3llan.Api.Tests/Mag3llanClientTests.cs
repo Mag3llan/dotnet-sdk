@@ -129,5 +129,57 @@ namespace Mag3llan.Api.Tests
                 Assert.That(ex.Message, Is.StringStarting(response.ErrorMessage));
             }
         }
+
+        [TestFixture]
+        public class DeletePreferenceTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.DeletePreference(-1, 1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void NegativeItemId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.DeletePreference(1, -1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("itemId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestDeletesPreference()
+            {
+                var response = A.Fake<RestResponse>();
+                response.StatusCode = System.Net.HttpStatusCode.NoContent;
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.DeletePreference(1, 1), Is.EqualTo(true));
+            }
+
+            [Test]
+            public void MissingPreferenceDoesNotDelete()
+            {
+                var response = A.Fake<RestResponse>();
+                response.StatusCode = System.Net.HttpStatusCode.NotFound;
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.DeletePreference(1, 1), Is.EqualTo(false));
+            }
+        }
     }
 }

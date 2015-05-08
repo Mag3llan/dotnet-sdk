@@ -52,5 +52,17 @@ namespace Mag3llan.Api.Client
             }
         }
 
+        public bool DeletePreference(long userId, long itemId)
+        {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+            if (itemId < 0) throw new ArgumentOutOfRangeException("itemId", "must be positive");
+
+            var request = new RestRequest("preference/" + userId + "/" + itemId, Method.DELETE);
+
+            var response = this.client.Execute(request);
+
+            return response.StatusCode == System.Net.HttpStatusCode.NoContent;
+        }
+
     }
 }
