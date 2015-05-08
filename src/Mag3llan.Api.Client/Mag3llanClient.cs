@@ -34,12 +34,12 @@ namespace Mag3llan.Api.Client
         /// <param name="userId">User Identifier, must be positive</param>
         /// <param name="itemId">Item Identifier, must be positive</param>
         /// <param name="value">score, can be positive or negative</param>
-        public void SetPreference(long userId, long itemId, double value)
+        public void SetPreference(long userId, long itemId, double value, string comments = null, bool force = false)
         {
             if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
             if (itemId < 0) throw new ArgumentOutOfRangeException("itemId", "must be positive");
 
-            var preference = new Preference(userId, itemId, value);
+            var preference = new Preference(userId, itemId, value, comments);
 
             var request = new RestRequest("preference", Method.POST);
             request.AddBody(preference);
@@ -64,5 +64,15 @@ namespace Mag3llan.Api.Client
             return response.StatusCode == System.Net.HttpStatusCode.NoContent;
         }
 
+        public bool DeleteUser(long userId)
+        {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+
+            var request = new RestRequest("user/" + userId, Method.DELETE);
+
+            var response = this.client.Execute(request);
+
+            return response.StatusCode == System.Net.HttpStatusCode.NoContent;
+        }
     }
 }

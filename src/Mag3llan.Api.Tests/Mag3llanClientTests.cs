@@ -181,5 +181,48 @@ namespace Mag3llan.Api.Tests
                 Assert.That(sdk.DeletePreference(1, 1), Is.EqualTo(false));
             }
         }
+
+        [TestFixture]
+        public class DeleteUserTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.DeleteUser(-1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestDeletesUser()
+            {
+                var response = A.Fake<RestResponse>();
+                response.StatusCode = System.Net.HttpStatusCode.NoContent;
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.DeleteUser(1), Is.EqualTo(true));
+            }
+
+            [Test]
+            public void MissingUserDoesNotDelete()
+            {
+                var response = A.Fake<RestResponse>();
+                response.StatusCode = System.Net.HttpStatusCode.NotFound;
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.DeleteUser(1), Is.EqualTo(false));
+            }
+        }
     }
 }
