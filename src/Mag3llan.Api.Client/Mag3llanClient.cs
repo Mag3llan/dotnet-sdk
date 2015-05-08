@@ -44,7 +44,12 @@ namespace Mag3llan.Api.Client
             var request = new RestRequest("preference", Method.POST);
             request.AddBody(preference);
 
-            var repsonse = this.client.Execute(request);
+            var response = this.client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            {
+                throw new InvalidOperationException(response.ErrorMessage);
+            }
         }
 
     }

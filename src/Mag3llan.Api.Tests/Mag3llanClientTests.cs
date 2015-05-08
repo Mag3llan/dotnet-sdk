@@ -80,11 +80,10 @@ namespace Mag3llan.Api.Tests
             private Mag3llanClient sdk;
             private IRestClient client;
 
-            [TestFixtureSetUp]
-            public void SetupOnce()
+            [SetUp]
+            public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                //A.CallTo(() => )
                 this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
             }
 
@@ -109,8 +108,25 @@ namespace Mag3llan.Api.Tests
             [Test]
             public void ValidRequestCreatesPreference()
             {
+                var response = A.Fake<RestResponse>();
+                response.StatusCode = System.Net.HttpStatusCode.Created;
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
+
                 sdk.SetPreference(1, 1, 1);
                 A.CallTo(() => this.client.Execute(A<RestRequest>._)).MustHaveHappened(Repeated.Exactly.Once);
+            }
+
+            [Test]
+            public void DuplicateRequestThrowsException()
+            {
+                var response = A.Fake<RestResponse>();
+                response.StatusCode = System.Net.HttpStatusCode.Conflict;
+                response.ErrorMessage = "The request could not be processed becuase of conflict in the request.";
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
+                
+                var ex = Assert.Throws<InvalidOperationException>(() => sdk.SetPreference(1, 1, 1));
+
+                Assert.That(ex.Message, Is.StringStarting(response.ErrorMessage));
             }
         }
     }
