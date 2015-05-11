@@ -79,11 +79,12 @@ namespace Mag3llan.Api.Client
             return response.StatusCode == System.Net.HttpStatusCode.NoContent;
         }
 
-        public List<long> GetPlu(long userId, bool force = false)
+        public List<long> GetPlu(long userId, decimal threshold = -1)
         {
             if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+            if (threshold < -1 || threshold > 1) throw new ArgumentOutOfRangeException("threshold", "must be between -1 and 1");
 
-            var request = new RestRequest("plu/" + userId + "?force=" + force.ToString(), Method.GET);
+            var request = new RestRequest("plu/" + userId + (threshold > -1 ? "?threshold=" + threshold : string.Empty), Method.GET);
 
             var response = this.client.Execute<List<long>>(request);
 

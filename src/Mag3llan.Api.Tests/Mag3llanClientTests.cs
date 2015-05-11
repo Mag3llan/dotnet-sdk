@@ -247,6 +247,24 @@ namespace Mag3llan.Api.Tests
             }
 
             [Test]
+            public void ThresholdTooLow()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(1, -1.1m));
+
+                Assert.That(ex.ParamName, Is.EqualTo("threshold"));
+                Assert.That(ex.Message, Is.StringStarting("must be between -1 and 1"));
+            }
+
+            [Test]
+            public void ThresholdTooHigh()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(1, 1.1m));
+
+                Assert.That(ex.ParamName, Is.EqualTo("threshold"));
+                Assert.That(ex.Message, Is.StringStarting("must be between -1 and 1"));
+            }
+
+            [Test]
             public void ValidRequestReturnsOtherUsers()
             {
                 var expected = new List<long> { 123, 456 };
