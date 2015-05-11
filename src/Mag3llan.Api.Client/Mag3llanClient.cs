@@ -20,6 +20,7 @@ namespace Mag3llan.Api.Client
         {
             if (client == null) throw new ArgumentNullException("client");
             if (string.IsNullOrWhiteSpace(hostname)) throw new ArgumentNullException("hostname");
+            if (hostname.Contains("http")) throw new ArgumentException("please specify only the hostname", "hostname");
             if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException("key");
 
             this.client = client;

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Mag3llan.Api.Tests
 {
-    public class Mag3llanClientTests
+    public class UnitTests
     {
         [TestFixture]
         public class ConstructorTests
@@ -21,6 +21,8 @@ namespace Mag3llan.Api.Tests
             [TestCase(")")]
             [TestCase("%")]
             [TestCase("~")]
+            [TestCase("/")]
+            [TestCase(":")]
             public void InvalidUriCharactersThrowsException(string chars)
             {
                 Assert.Throws<UriFormatException>(() => new Mag3llanClient(chars, "bar"));
@@ -51,6 +53,14 @@ namespace Mag3llan.Api.Tests
             }
 
             [Test]
+            public void HostnameContainingHttpThrowsException()
+            {
+                var ex = Assert.Throws<ArgumentException>(() => new Mag3llanClient("http://foo", "bar"));
+
+                Assert.That(ex.ParamName, Is.EqualTo("hostname"));
+            }
+
+            [Test]
             public void MissingKeyThrowsException()
             {
                 var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("api", null));
@@ -61,7 +71,7 @@ namespace Mag3llan.Api.Tests
             [Test]
             public void EmptyKeyThrowsException()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("http://api", string.Empty));
+                var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("api", string.Empty));
 
                 Assert.That(ex.ParamName, Is.EqualTo("key"));
             }
@@ -69,7 +79,7 @@ namespace Mag3llan.Api.Tests
             [Test]
             public void BlankKeyThrowsException()
             {
-                var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("http://api", "  "));
+                var ex = Assert.Throws<ArgumentNullException>(() => new Mag3llanClient("api", "  "));
 
                 Assert.That(ex.ParamName, Is.EqualTo("key"));
             }
@@ -85,7 +95,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -139,7 +149,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -191,7 +201,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -234,7 +244,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -299,7 +309,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -373,7 +383,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -429,7 +439,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
@@ -485,7 +495,7 @@ namespace Mag3llan.Api.Tests
             public void SetupBeforeEachTest()
             {
                 this.client = A.Fake<IRestClient>();
-                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+                this.sdk = new Mag3llanClient(this.client, "api", "abc");
             }
 
             [Test]
