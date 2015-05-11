@@ -41,14 +41,18 @@ namespace Mag3llan.Api.Client
 
             var preference = new Preference(userId, itemId, value, comments);
 
-            var request = new RestRequest("preference", Method.POST);
+            var request = new RestRequest("preference", Method.PUT);
             request.AddBody(preference);
 
             var response = this.client.Execute(request);
 
-            if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            switch (response.StatusCode)
             {
-                throw new InvalidOperationException(response.ErrorMessage);
+                case System.Net.HttpStatusCode.OK:
+                case System.Net.HttpStatusCode.Created:
+                    break;
+                default:
+                    throw new InvalidOperationException(response.ErrorMessage);
             }
         }
 
@@ -73,6 +77,20 @@ namespace Mag3llan.Api.Client
             var response = this.client.Execute(request);
 
             return response.StatusCode == System.Net.HttpStatusCode.NoContent;
+        }
+
+        public List<long> GetPlu(long userId, bool force = false)
+        {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+
+            var request = new RestRequest("plu/" + userId + "?force=" + force.ToString(), Method.GET);
+
+            var response = this.client.Execute<List<long>>(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                throw new Exception(response.ErrorMessage);
+
+            return response.Data;
         }
     }
 }

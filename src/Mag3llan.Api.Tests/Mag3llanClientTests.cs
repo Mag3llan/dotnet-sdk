@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Mag3llan.Api.Client;
 using RestSharp;
 using FakeItEasy;
+using System.Collections.Generic;
 
 namespace Mag3llan.Api.Tests
 {
@@ -117,16 +118,14 @@ namespace Mag3llan.Api.Tests
             }
 
             [Test]
-            public void DuplicateRequestThrowsException()
+            public void DuplicateRequestUpdatesPreference()
             {
                 var response = A.Fake<RestResponse>();
-                response.StatusCode = System.Net.HttpStatusCode.Conflict;
-                response.ErrorMessage = "The request could not be processed becuase of conflict in the request.";
+                response.StatusCode = System.Net.HttpStatusCode.OK;
                 A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
-                
-                var ex = Assert.Throws<InvalidOperationException>(() => sdk.SetPreference(1, 1, 1));
 
-                Assert.That(ex.Message, Is.StringStarting(response.ErrorMessage));
+                sdk.SetPreference(1, 1, 1);
+                A.CallTo(() => this.client.Execute(A<RestRequest>._)).MustHaveHappened(Repeated.Exactly.Once);
             }
         }
 
@@ -222,6 +221,53 @@ namespace Mag3llan.Api.Tests
                 A.CallTo(() => this.client.Execute(A<RestRequest>._)).Returns(response);
 
                 Assert.That(sdk.DeleteUser(1), Is.EqualTo(false));
+            }
+        }
+
+        [TestFixture]
+        public class GetPluTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(-1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestReturnsOtherUsers()
+            {
+                var expected = new List<long> { 123, 456 };
+                var response = A.Fake<RestResponse<List<long>>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<List<long>>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetPlu(1), Is.EqualTo(expected));
+            }
+
+            [Test]
+            public void MissingUserReturnsEmptyList()
+            {
+                var expected = new List<long>();
+                var response = A.Fake<RestResponse<List<long>>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<List<long>>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetPlu(1), Is.EqualTo(expected));
             }
         }
     }
