@@ -474,5 +474,50 @@ namespace Mag3llan.Api.Tests
                 Assert.That(ex.Message, Is.StringStarting("user not found"));
             }
         }
+
+        [TestFixture]
+        public class GetRecommendationsTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetRecommendations(-1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestReturnsSimilarity()
+            {
+                var expected = new List<Recommendation> { new Recommendation { ItemId = 1, Value = 2.5m } };
+                var response = A.Fake<RestResponse<List<Recommendation>>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<List<Recommendation>>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetRecommendations(1), Is.EqualTo(expected));
+            }
+
+            [Test]
+            public void MissingUserThrowsError()
+            {
+                var response = A.Fake<RestResponse<List<Recommendation>>>();
+                response.StatusCode = System.Net.HttpStatusCode.InternalServerError;
+                A.CallTo(() => this.client.Execute<List<Recommendation>>(A<RestRequest>._)).Returns(response);
+
+                Assert.Throws<Exception>(() => sdk.GetRecommendations(1));
+            }
+        }
     }
 }

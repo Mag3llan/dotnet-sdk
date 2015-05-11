@@ -143,5 +143,19 @@ namespace Mag3llan.Api.Client
                     throw new Exception(response.ErrorMessage);
             }
         }
+
+        public List<Recommendation> GetRecommendations(long userId)
+        {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+
+            var request = new RestRequest("recommendation/" + userId, Method.GET);
+
+            var response = this.client.Execute<List<Recommendation>>(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return response.Data;
+
+            throw new Exception(response.ErrorMessage);
+        }
     }
 }
