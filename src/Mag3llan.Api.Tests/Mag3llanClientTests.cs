@@ -288,5 +288,135 @@ namespace Mag3llan.Api.Tests
                 Assert.That(sdk.GetPlu(1), Is.EqualTo(expected));
             }
         }
+
+        [TestFixture]
+        public class GetPluItemTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(-1, 1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void NegativeItemId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(1, -1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("itemId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ThresholdTooLow()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(1, 1, -1.1m));
+
+                Assert.That(ex.ParamName, Is.EqualTo("threshold"));
+                Assert.That(ex.Message, Is.StringStarting("must be between -1 and 1"));
+            }
+
+            [Test]
+            public void ThresholdTooHigh()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetPlu(1, 1, 1.1m));
+
+                Assert.That(ex.ParamName, Is.EqualTo("threshold"));
+                Assert.That(ex.Message, Is.StringStarting("must be between -1 and 1"));
+            }
+
+            [Test]
+            public void ValidRequestReturnsOtherUsers()
+            {
+                var expected = new List<long> { 123, 456 };
+                var response = A.Fake<RestResponse<List<long>>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<List<long>>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetPlu(1, 1), Is.EqualTo(expected));
+            }
+
+            [Test]
+            public void MissingUserReturnsEmptyList()
+            {
+                var expected = new List<long>();
+                var response = A.Fake<RestResponse<List<long>>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<List<long>>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetPlu(1, 1), Is.EqualTo(expected));
+            }
+        }
+
+        [TestFixture]
+        public class GetSimilarityTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetSimilarity(-1, 1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void NegativeOtherUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetSimilarity(1, -1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("otherUserId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestReturnsSimilarity()
+            {
+                var expected = 3.5m;
+                var response = A.Fake<RestResponse<decimal>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<decimal>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetSimilarity(1, 1), Is.EqualTo(expected));
+            }
+
+            [Test]
+            public void MissingUserReturnsNotFound()
+            {
+                var response = A.Fake<RestResponse<decimal>>();
+                response.StatusCode = System.Net.HttpStatusCode.NotFound;
+                A.CallTo(() => this.client.Execute<decimal>(A<RestRequest>._)).Returns(response);
+
+                var ex = Assert.Throws<ArgumentException>(() => sdk.GetSimilarity(1, 1));
+
+                Assert.That(ex.Message, Is.StringStarting("user not found"));
+            }
+        }
     }
 }

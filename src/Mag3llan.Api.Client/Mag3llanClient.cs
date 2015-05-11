@@ -81,10 +81,20 @@ namespace Mag3llan.Api.Client
 
         public List<long> GetPlu(long userId, decimal threshold = -1)
         {
+            return this.GetPlu(userId, 0, threshold);
+        }
+
+        public List<long> GetPlu(long userId, long itemId, decimal threshold = -1)
+        {
             if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+            if (itemId < 0) throw new ArgumentOutOfRangeException("itemId", "must be positive");
             if (threshold < -1 || threshold > 1) throw new ArgumentOutOfRangeException("threshold", "must be between -1 and 1");
 
-            var request = new RestRequest("plu/" + userId + (threshold > -1 ? "?threshold=" + threshold : string.Empty), Method.GET);
+            var url = "plu/" + userId +
+                (itemId != 0 ? "/rating/" + itemId : string.Empty) +
+                (threshold > -1 ? "?threshold=" + threshold : string.Empty);
+
+            var request = new RestRequest(url, Method.GET);
 
             var response = this.client.Execute<List<long>>(request);
 
@@ -92,6 +102,26 @@ namespace Mag3llan.Api.Client
                 throw new Exception(response.ErrorMessage);
 
             return response.Data;
+        }
+
+        public decimal GetSimilarity(long userId, long otherUserId, bool force = false)
+        {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+            if (otherUserId < 0) throw new ArgumentOutOfRangeException("otherUserId", "must be positive");
+
+            var request = new RestRequest("similarity/" + userId + "/" + otherUserId + "?force=" + force, Method.GET);
+
+            var response = this.client.Execute<decimal>(request);
+
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    return response.Data;
+                case System.Net.HttpStatusCode.NotFound:
+                    throw new ArgumentException("user not found");
+                default:
+                    throw new Exception(response.ErrorMessage);
+            }
         }
     }
 }
