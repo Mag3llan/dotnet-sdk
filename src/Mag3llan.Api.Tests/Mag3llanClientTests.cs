@@ -418,5 +418,61 @@ namespace Mag3llan.Api.Tests
                 Assert.That(ex.Message, Is.StringStarting("user not found"));
             }
         }
+
+        [TestFixture]
+        public class GetOverlapsTests
+        {
+            private Mag3llanClient sdk;
+            private IRestClient client;
+
+            [SetUp]
+            public void SetupBeforeEachTest()
+            {
+                this.client = A.Fake<IRestClient>();
+                this.sdk = new Mag3llanClient(this.client, "http://api", "abc");
+            }
+
+            [Test]
+            public void NegativeUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetOverlaps(-1, 1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("userId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void NegativeOtherUserId()
+            {
+                var ex = Assert.Throws<ArgumentOutOfRangeException>(() => sdk.GetOverlaps(1, -1));
+
+                Assert.That(ex.ParamName, Is.EqualTo("otherUserId"));
+                Assert.That(ex.Message, Is.StringStarting("must be positive"));
+            }
+
+            [Test]
+            public void ValidRequestReturnsSimilarity()
+            {
+                var expected = new List<Overlap> { new Overlap { ItemId = 1, Rating = 2.5m, OtherRating = 3.5m, Delta = 1m } };
+                var response = A.Fake<RestResponse<List<Overlap>>>();
+                response.StatusCode = System.Net.HttpStatusCode.OK;
+                response.Data = expected;
+                A.CallTo(() => this.client.Execute<List<Overlap>>(A<RestRequest>._)).Returns(response);
+
+                Assert.That(sdk.GetOverlaps(1, 1), Is.EqualTo(expected));
+            }
+
+            [Test]
+            public void MissingUserReturnsNotFound()
+            {
+                var response = A.Fake<RestResponse<List<Overlap>>>();
+                response.StatusCode = System.Net.HttpStatusCode.NotFound;
+                A.CallTo(() => this.client.Execute<List<Overlap>>(A<RestRequest>._)).Returns(response);
+
+                var ex = Assert.Throws<ArgumentException>(() => sdk.GetOverlaps(1, 1));
+
+                Assert.That(ex.Message, Is.StringStarting("user not found"));
+            }
+        }
     }
 }

@@ -123,5 +123,25 @@ namespace Mag3llan.Api.Client
                     throw new Exception(response.ErrorMessage);
             }
         }
+
+        public List<Overlap> GetOverlaps(long userId, long otherUserId)
+        {
+            if (userId < 0) throw new ArgumentOutOfRangeException("userId", "must be positive");
+            if (otherUserId < 0) throw new ArgumentOutOfRangeException("otherUserId", "must be positive");
+
+            var request = new RestRequest("overlaps/" + userId + "/" + otherUserId, Method.GET);
+
+            var response = this.client.Execute<List<Overlap>>(request);
+
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    return response.Data;
+                case System.Net.HttpStatusCode.NotFound:
+                    throw new ArgumentException("user not found");
+                default:
+                    throw new Exception(response.ErrorMessage);
+            }
+        }
     }
 }

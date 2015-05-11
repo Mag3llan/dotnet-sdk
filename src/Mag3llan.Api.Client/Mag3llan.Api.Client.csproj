@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mag3llanClient.cs" />
+    <Compile Include="Overlap.cs" />
     <Compile Include="Preference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
