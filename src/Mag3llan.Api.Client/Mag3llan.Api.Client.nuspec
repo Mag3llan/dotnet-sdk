@@ -11,7 +11,7 @@
     <description>$description$</description>
     <releaseNotes>Please refer to GitHub for details.</releaseNotes>
     <copyright>Copyright Mag3llan Ltd 2015</copyright>
-    <tags>Mag3llan "User Similarity" .Net</tags>
+    <tags>Mag3llan user similarity taste preferences</tags>
     <dependencies>
       <dependency id="RestSharp" version="105.1.0" />
     </dependencies>
